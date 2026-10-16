@@ -2,9 +2,11 @@ import '../data/almacen_local.dart';
 import '../model/incidencia.dart';
 
 class GestorIncidencias {
-  final AlmacenLocal datos = AlmacenLocal();
+  final AlmacenLocal datos;
   List<Incidencia> incidencias = [];
   int cantidadPendientes = 0;
+
+  GestorIncidencias({AlmacenLocal? datos}) : datos = datos ?? AlmacenLocal();
 
   Future<void> iniciar() async {
     incidencias = await datos.leer();
@@ -33,6 +35,7 @@ class GestorIncidencias {
     for (var i = 0; i < incidencias.length; i++) {
       if (incidencias[i].id == id) {
         incidencias[i].estado = estado;
+        await datos.guardar(incidencias);
         break;
       }
     }
