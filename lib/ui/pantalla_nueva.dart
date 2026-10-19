@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../model/incidencia.dart';
 import '../services/gestor_incidencias.dart';
 
 class PantallaNueva extends StatefulWidget {
@@ -15,6 +16,7 @@ class _PantallaNuevaState extends State<PantallaNueva> {
   final descripcion = TextEditingController();
   final cliente = TextEditingController();
   String categoria = 'Software';
+  String prioridad = Incidencia.prioridadPorDefecto;
   bool ocupado = false;
 
   @override
@@ -30,7 +32,11 @@ class _PantallaNuevaState extends State<PantallaNueva> {
     setState(() => ocupado = true);
     try {
       await widget.gestor.crear(
-        titulo.text.trim(), descripcion.text.trim(), cliente.text.trim(), categoria,
+        titulo.text.trim(),
+        descripcion.text.trim(),
+        cliente.text.trim(),
+        categoria,
+        prioridad: prioridad,
       );
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
@@ -72,11 +78,19 @@ class _PantallaNuevaState extends State<PantallaNueva> {
                 campo('Descripción', descripcion, lineas: 4),
                 campo('Cliente', cliente),
                 DropdownButtonFormField<String>(
-                  value: categoria,
+                  initialValue: categoria,
                   decoration: const InputDecoration(labelText: 'Categoría', border: OutlineInputBorder()),
                   items: ['Software', 'Hardware', 'Redes']
                       .map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                   onChanged: ocupado ? null : (v) => setState(() => categoria = v ?? 'Software'),
+                ),
+                const SizedBox(height: 15),
+                DropdownButtonFormField<String>(
+                  initialValue: prioridad,
+                  decoration: const InputDecoration(labelText: 'Prioridad', border: OutlineInputBorder()),
+                  items: Incidencia.prioridadesValidas
+                      .map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+                  onChanged: ocupado ? null : (v) => setState(() => prioridad = v ?? Incidencia.prioridadPorDefecto),
                 ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
